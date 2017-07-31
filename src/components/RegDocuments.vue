@@ -1,46 +1,50 @@
 <template>
-  <div style="width: 215px; max-width: 90vw; margin-left: 15px;">
-    <div>
-    <q-select v-if="showSelect" v-model="select" :options="selectOptions" float-label="Document"/>
-    <q-input v-if="showInput" @blur="blur" autofocus v-model="text" float-label="Other document"/>
-    <q-input v-if="input" v-model="inputValue" float-label="Number of Document"/>
+<div class="layout-padding row justify-center">
+  <div style="display: flex;">
+    <div style="width: 180px; margin-left: -200px;">
+    <q-select v-if="!showInput" v-model="select" :options="selectOptions" @change="toggleDisplay" float-label="Document"/>
     </div>
-       {{ show }}
-    <div style="width: 103px; display: flex;">
+    <div style="width: 180px; margin-left: -200px;">
+    <q-input v-show="showInput" ref="input1" @blur="blur" v-model="text" float-label="Other document"/>
+    </div>
+    <div style="margin-left: 30px;">
+    <q-input v-model="inputValue" float-label="Number of Document"/>
+    </div>
+    <div style="width: 400px; display: flex; margin-left: 10px;">
         <q-btn
+          class="flex inline shadow-box flex-center"
+          standard style="width: 200px; height: 10px; margin-top: 20px; background-color: dark; background-color: #dddddd;"
           link
           v-for="modal in types"
           :key="modal"
           @click="$refs[modal.ref].open()"
           v-ripple.mat
         >
-          <q-item-main :label="modal.label" />
+          <q-item-main :label="modal.label" @click="modalFull"/>
         </q-btn>
     </div>
-   <q-modal ref="layoutModal" :content-css="{minWidth: '80vw', minHeight: '80vh'}">
-        <q-modal-layout>
-            <q-btn flat @click="$refs.layoutModal.close()">
-            </q-btn>
-        </q-modal-layout>
+
+    <q-modal ref="maximizedModal" maximized :content-css="{padding: '0px', height: '567px', width: '100%'}" >
+<div :style="{display: none}">
+        <q-gallery-carousel style="height: 567px; width: 100%;" infinite autoplay dots :src="gallery"></q-gallery-carousel>
+</div>
+<!-- horizontal-quick-view -->
+
+          <!-- <q-btn style="margin-left: 90%; width: 200px; height: 10px; margin-top: 5px;
+            background-color: dark; background-color: #dddddd;" color="tertiary" @click="$refs.maximizedModal.close()">Close</q-btn> -->
      </q-modal>
-
-    <q-modal ref="maximizedModal" maximized :content-css="{padding: '50px'}">
-      <h4></h4><p>Images</p>
-       <div class="layout-padding row justify-center">
-        <div style="width: 500px; max-width: 90vw;">
-          <p class="caption">Oferecimento:</p>
-          <q-gallery :src="gallery"></q-gallery>
-        </div>
-       </div>
-      <q-btn style="margin-left: 95%;" color="tertiary" @click="$refs.maximizedModal.close()">Close</q-btn>
-    </q-modal>
-
+        <!-- <div class="row items-center">
+          <i aria-hidden="true" class="q-icon material-icons">view_carousel</i>
+          <i aria-hidden="true" class="q-icon material-icons">fullscreen_exit</i>
+        </div> -->
+  </div>
   </div>
 
 </template>
 
 <script>
-import { QSelect, QBtn, QInput, QModal, QModalLayout, QList, QItemMain, Ripple, QGallery, QGalleryCarousel } from 'quasar'
+
+import { QSelect, QBtn, QInput, QModal, QModalLayout, QList, QItemMain, Ripple, QGallery, QGalleryCarousel, QIcon } from 'quasar'
 
 export default {
   name: 'RegDocuments',
@@ -54,17 +58,18 @@ export default {
     Ripple,
     QItemMain,
     QGallery,
-    QGalleryCarousel
+    QGalleryCarousel,
+    QIcon
   },
   props: {
-    documentType: {
-      type: String,
-      required: true
-    },
-    value: {
-      type: Number,
-      required: true
-    },
+    // documentType: {
+    //   type: String,
+    //   required: true
+    // },
+    // value: {
+    //   type: Number,
+    //   required: true
+    // },
     images: {
       type: Array,
       required: false
@@ -75,6 +80,7 @@ export default {
   },
   data () {
     return {
+      none: 'none',
       text: '',
       select: '',
       selectOptions: [
@@ -95,32 +101,45 @@ export default {
         {
           label: 'Visualizar',
           ref: 'maximizedModal'
-        },
-        {
-          label: 'Upload de Imagens',
-          ref: ''
-        },
-        {
-          label: 'Tirar Fotos',
-          ref: ''
         }
+        // {
+        //   label: 'Foto',
+        //   ref: ''
+        // },
+        // {
+        //   label: 'Update de Foto',
+        //   ref: ''
+        // }
       ],
       gallery: [
          require('src/assets/vue.png'),
-         require('src/assets/js.png',),
-         require('src/assets/react.png',),
-         require('src/assets/npm.png',),
-         require('src/assets/node.png',),
+         require('src/assets/js.png'),
+         require('src/assets/react.png'),
+         require('src/assets/npm.png'),
+         require('src/assets/node.png'),
          require('src/assets/quasar-logo-full.svg')
       ],
       showInput: false,
-      showSelect: true,
-      input: true,
       inputValue: '',
       position: 'bottom'
     }
   }, // event change
+  updated() {
+    if (this.select === 'Other') {
+      this.$refs.input1.focus();
+    }
+  },
   methods: {
+    toggleDisplay(selected) {
+      if (selected === 'Other') {
+        this.showInput = true;
+        return;
+      }
+      this.showInput = false;
+    },
+    modalFull() {
+      this.none = 'flex';
+    },
     blur() {
       const text = this.text
       if (text === text) {
@@ -142,13 +161,6 @@ export default {
     }
   },
   computed: {
-    show() {
-      if (this.select === 'Other') {
-        this.showInput = true;
-        this.showSelect = false;
-        this.input = false;
-      }
-    }
   }
 }
 </script>

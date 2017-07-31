@@ -11,7 +11,6 @@
       >
         <q-icon name="menu" />
       </q-btn>
-
       <q-toolbar-title>
         Quasar App
         <div slot="subtitle">Running on Quasar v{{$q.version}}</div>

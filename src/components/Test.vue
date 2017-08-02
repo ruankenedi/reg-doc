@@ -1,34 +1,11 @@
 <template>
   <div class="layout-padding row justify-center">
-    <div style="width: 103px; max-width: 90vw;">
-        <q-btn
-          link
-          v-for="modal in types"
-          :key="modal"
-          @click="$refs[modal.ref].open()"
-          v-ripple.mat
-        >
-          <q-item-main :label="modal.label" />
-        </q-btn>
-    </div>
-   <q-modal ref="layoutModal" :content-css="{minWidth: '80vw', minHeight: '80vh'}">
-        <q-modal-layout>
-            <q-btn flat @click="$refs.layoutModal.close()">
-                <q-icon name="keyboard_arrow_left" />
-            </q-btn>
-        </q-modal-layout>
-     </q-modal>
-
-    <q-modal ref="maximizedModal" maximized :content-css="{padding: '50px'}">
-      <h4>Maximized Modal</h4><p>This one is maximized on bigger screens too.</p>
-      <q-btn color="tertiary" @click="$refs.maximizedModal.close()">Close Me</q-btn>
-    </q-modal>
-
-
+    <RegDocuments @regDoc="method"></RegDocuments>
   </div>
 </template>
 
 <script>
+import RegDocuments from './RegDocuments.vue'
 import {
   Toast,
   QBtn,
@@ -43,7 +20,8 @@ export default {
     QModal,
     QModalLayout,
     QList,
-    QItemMain
+    QItemMain,
+    RegDocuments
   },
   data () {
     return {
@@ -62,6 +40,9 @@ export default {
       this.$nextTick(() => {
         this.$refs.positionModal.open()
       })
+    },
+    method(obj) {
+      console.log(obj)
     }
   }
 }

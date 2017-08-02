@@ -1,50 +1,34 @@
 <template>
-<div class="layout-padding row justify-center">
-  <div style="display: flex;">
-    <div style="width: 180px; margin-left: -200px;">
-    <q-select v-if="!showInput" v-model="select" :options="selectOptions" @change="toggleDisplay" float-label="Document"/>
-    </div>
-    <div style="width: 180px; margin-left: -200px;">
-    <q-input v-show="showInput" ref="input1" @blur="blur" v-model="text" float-label="Other document"/>
-    </div>
-    <div style="margin-left: 30px;">
-    <q-input v-model="inputValue" float-label="Number of Document"/>
-    </div>
-    <div style="width: 400px; display: flex; margin-left: 10px;">
-        <q-btn
-          class="flex inline shadow-box flex-center"
-          standard style="width: 200px; height: 10px; margin-top: 20px; background-color: dark; background-color: #dddddd;"
-          link
-          v-for="modal in types"
-          :key="modal"
-          @click="$refs[modal.ref].open()"
-          v-ripple.mat
-        >
-          <q-item-main :label="modal.label" @click="modalFull"/>
+  <div class="layout-padding row justify-center">
+    <div style="display: flex;">
+      <q-field style="width: 115px;">
+        <q-select v-if="!showInput" v-model="select" :options="selectOptions" @change="toggleDisplay" float-label="Document"/>
+
+        <q-input v-show="showInput" ref="input1" @blur="blur" v-model="text" float-label="Other document"/>
+      </q-field>
+      <q-field style="width: 135px;">
+        <q-input v-model="inputValue" @blur="emitData" float-label="Document Number"/>
+      </q-field>
+      <div>
+        <q-btn icon="photo library" color="primary"  style="margin-top: 22px; margin-left: 5px;"
+        link v-for="modal in types" :key="modal" @click="requestFullscreen, modalFull" v-ripple.mat>
+        view
+            <!-- <q-item-main :label="modal.label" @click="modalFull"/>   <q-icon name="photo library" style="margin: 2px;"></q-icon>view -->
         </q-btn>
+      </div>
+        <q-modal ref="maximizedModal" maximized :content-css="{padding: '0px'}">
+          <div :style="{display: none}">
+            <q-gallery-carousel ref="gallery" fullscreen infinite dots :src="gallery"></q-gallery-carousel>
+          </div>
+        </q-modal>
     </div>
-
-    <q-modal ref="maximizedModal" maximized :content-css="{padding: '0px', height: '567px', width: '100%'}" >
-<div :style="{display: none}">
-        <q-gallery-carousel style="height: 567px; width: 100%;" infinite autoplay dots :src="gallery"></q-gallery-carousel>
-</div>
-<!-- horizontal-quick-view -->
-
-          <!-- <q-btn style="margin-left: 90%; width: 200px; height: 10px; margin-top: 5px;
-            background-color: dark; background-color: #dddddd;" color="tertiary" @click="$refs.maximizedModal.close()">Close</q-btn> -->
-     </q-modal>
-        <!-- <div class="row items-center">
-          <i aria-hidden="true" class="q-icon material-icons">view_carousel</i>
-          <i aria-hidden="true" class="q-icon material-icons">fullscreen_exit</i>
-        </div> -->
-  </div>
   </div>
 
 </template>
 
 <script>
-
-import { QSelect, QBtn, QInput, QModal, QModalLayout, QList, QItemMain, Ripple, QGallery, QGalleryCarousel, QIcon } from 'quasar'
+import QGalleryCarousel from './Comp.vue'
+import { QField, QSelect, QBtn, QInput, QModal, QModalLayout, QList, QItemMain, Ripple, QGallery, QIcon } from 'quasar'
 
 export default {
   name: 'RegDocuments',
@@ -59,14 +43,15 @@ export default {
     QItemMain,
     QGallery,
     QGalleryCarousel,
-    QIcon
+    QIcon,
+    QField
   },
   props: {
     // documentType: {
     //   type: String,
     //   required: true
     // },
-    // value: {
+    // numberDoc: {
     //   type: Number,
     //   required: true
     // },
@@ -99,7 +84,6 @@ export default {
       ],
       types: [
         {
-          label: 'Visualizar',
           ref: 'maximizedModal'
         }
         // {
@@ -107,9 +91,15 @@ export default {
         //   ref: ''
         // },
         // {
-        //   label: 'Update de Foto',
+        //   label: 'Update Imagem',
         //   ref: ''
         // }
+      ],
+      numberDocuments : [
+        {
+          label: 'CPF',
+          number: '123'
+        }
       ],
       gallery: [
          require('src/assets/vue.png'),
@@ -123,7 +113,7 @@ export default {
       inputValue: '',
       position: 'bottom'
     }
-  }, // event change
+  },
   updated() {
     if (this.select === 'Other') {
       this.$refs.input1.focus();
@@ -136,6 +126,11 @@ export default {
         return;
       }
       this.showInput = false;
+    },
+    requestFullscreen() {
+       if (this.$refs.gallery) {
+        this.$refs.gallery.$refs.slider.toggleFullscreen();
+      }
     },
     modalFull() {
       this.none = 'flex';
@@ -153,14 +148,12 @@ export default {
         });
       }
     },
-    openSpecialPosition (position) {
-      this.position = position;
-      this.$nextTick(() => {
-      this.$refs.positionModal.open();
-      });
+    emitData() {
+      console.log(this.$emit('regDoc', {
+      doc: this.select,
+      num: this.inputValue
+    }))
     }
-  },
-  computed: {
   }
 }
 </script>

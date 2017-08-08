@@ -1,4 +1,3 @@
-
 <template>
   <q-carousel
       ref="slider"
@@ -30,8 +29,11 @@
       @click="toggleQuickView()">
     </div>
 
+
     <q-icon name="view_carousel" slot="action" @click="toggleQuickView()"/>
     <q-icon name="delete" slot="action" @click="exclude()"/>
+    <q-icon name="file upload" slot="action"/>
+    <q-icon name="add a photo" slot="action"/>
 
     <div
       class="q-gallery-carousel-quickview"
@@ -97,9 +99,9 @@ export default {
           {
             label: 'Disagree',
             handler () {
-              console.log('Disagreed')
               if ('Disagreed') {
-
+                 const i = self.src.indexOf(self.currentSlide);
+                 self.$refs.slider.toggleFullscreen();
               }
 
             }
@@ -110,32 +112,36 @@ export default {
               if ('Agreed') {
                 const i = self.src.indexOf(self.currentSlide);
                 self.src.splice(self.currentSlide, 1);
-                (self.$refs.slider.toggleFullscreen())
+                self.$refs.slider.toggleFullscreen();
               }
             }
           }
         ]
-      })
+      });
     },
     toggleQuickView () {
       this.quickView = !this.quickView;
     },
     goToSlide (index, noAnimation) {
-      this.$refs.slider.goToSlide(index, noAnimation)
+      this.$refs.slider.goToSlide(index, noAnimation);
     },
     __selectImage (index) {
-      this.goToSlide(index, true)
-      this.toggleQuickView()
+      this.goToSlide(index, true);
+      this.toggleQuickView();
     },
     __updateCurrentSlide (value) {
-      console.log(this.currentSlide = value)
+      this.currentSlide = value;
       this.$emit('slide', value);
     },
-    exclude () {
-      this.openDialog();
-      if (this.src.length === 0) {
-          alert('oouuuu');
+    numberImg() {
+       if (this.src.length === 0) {
+        const i = this.src.indexOf(this.currentSlide);
+        this.$refs.slider.toggleFullscreen();
       }
+    },
+    exclude () {
+      this.numberImg();
+      this.openDialog();
     }
   }
 }

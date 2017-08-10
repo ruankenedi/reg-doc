@@ -8,7 +8,7 @@
           :label-width="3"
           :icon="icons.description"
         >
-          <q-select v-model="select" :options="selectOptions" @change="toggleDisplay" float-label="Document" />
+          <q-select v-model="value.value" :options="selectOptions" @change="toggleDisplay" float-label="Document" />
         </q-field>
 
         <q-field
@@ -30,7 +30,7 @@
           :label="label"
           :icon="icons.docNumber"
         >
-          <q-input type="number" v-model="inputValue" @change="emitData()" float-label="Doc. Number"/>
+          <q-input type="number" v-model="value.number" @change="emitData()" float-label="Doc. Number"/>
         </q-field>
 
        <div>
@@ -42,7 +42,7 @@
 
         <q-modal ref="maximizedModal" maximized :content-css="{padding: '0px'}">
           <div :style="{display: none}">
-            <q-gallery-carousel @slide="emitData" ref="gallery" fullscreen infinite dots :src="gallery"></q-gallery-carousel>
+            <q-gallery-carousel @slide="emitData" ref="gallery" fullscreen infinite dots :src="value.gallery"></q-gallery-carousel>
           </div>
         </q-modal>
     </div>
@@ -53,9 +53,9 @@
 <script>
 import QGalleryCarousel from './GalleryCarousel.vue'
 import { QField, QSelect, QBtn, QInput, QModal, QModalLayout, QList, QItemMain, Ripple, QGallery, QIcon } from 'quasar'
-
+//ligação entre componentes através de v-model
 export default {
-  name: 'sDocField',
+  name: 's-doc-field',
   components: {
     QSelect,
     QBtn,
@@ -83,22 +83,23 @@ export default {
       required: false
     },
     value: {
-      type: Object,
+      type: [Object, Array],
     },
     showIcons: {
       type: Boolean,
       required: false,
       default: true
     },
-    images: {
-      type: Array,
-      required: false
-    }
+    // images: {
+    //   type: Array,
+    //   required: false
+    // }
   },
   directives: {
     Ripple
   },
   mounted() {
+    this.ifIsSetSomeValue();
     this.iconsShow;
     this.labelShow;
     this.showSelecto;
@@ -113,15 +114,19 @@ export default {
       [
         {
           label: 'RG',
-          value: 'RG'
+          value: 'rg'
         },
         {
           label: 'CPF',
-          value: 'CPF'
+          value: 'cpf'
         },
         {
-          label: 'Other',
-          value: 'Other'
+          label: 'CNPJ',
+          value: 'cnpj'
+        },
+        {
+          label: 'OUTRO',
+          value: 'other'
         }
       ],
       optionsModal: [
@@ -144,18 +149,6 @@ export default {
       //   }
       // ],
       gallery: [
-         require('src/assets/vue.png'),
-         require('src/assets/js.png'),
-         require('src/assets/react.png'),
-         require('src/assets/npm.png'),
-         require('src/assets/node.png'),
-         require('src/assets/quasar-logo-full.svg'),
-         require('src/assets/vue.png'),
-         require('src/assets/js.png'),
-         require('src/assets/react.png'),
-         require('src/assets/npm.png'),
-         require('src/assets/node.png'),
-         require('src/assets/quasar-logo-full.svg')
       ],
       showInput: false,
       inputValue: '',
@@ -168,14 +161,14 @@ export default {
     }
   },
   updated() {
-    if (this.select === 'Other') {
+    if (this.value.value === 'other') {
       this.$refs.input1.focus();
     }
   },
   methods: {
     toggleDisplay(selected) {
       this.emitData();
-      if (selected === 'Other') {
+      if (selected === 'other') {
        this.showInput = true;
         this.showSelect = false;
         return;
@@ -196,7 +189,7 @@ export default {
       if (text === text) {
         this.showInput = false;
         this.showSelect = true;
-        this.select = '';
+        this.value.value = '';
         this.selectOptions.push({
           label: text,
           value: text
@@ -204,10 +197,17 @@ export default {
       }
     },
     emitData() {
+      let label = this.selectOptions.find((item) => {
+        return item = item.value === this.value.value && item.label;
+      });
+
+      label = label && label.label;
+
       this.$emit('change', {
-        doc: this.select,
-        num: this.inputValue,
-        img: this.gallery
+        value: this.value.value,
+        number: this.value.number,
+        gallery: this.value.gallery,
+        label: label
       })
     },
     typeArray() {
@@ -219,6 +219,29 @@ export default {
         });
       });
       this.showSelect = true;
+    },
+    ifHasLabel() {
+      if (this.value.label) {
+        this.selectOptions.push({
+          label: this.value.label, value: this.value.label
+        });
+      }
+    },
+    ifHasValue() {
+      if (this.value.value) {
+        this.selectOptions.push({
+          label: this.value.value, value: this.value.value
+        });
+      }
+    },
+    ifIsSetSomeValue() {
+      this.ifHasLabel();
+      this.ifHasValue();
+    },
+    kkkkk() {
+      if (this.value.label !== selected) {
+
+      }
     }
   },
   computed: {

@@ -1,6 +1,7 @@
 <template>
   <div>
-    <s-doc-field v-model="myDoc" ></s-doc-field >
+    <s-doc-field v-model="myDoc"></s-doc-field >
+
   </div>
 </template>
 
@@ -19,32 +20,15 @@ export default {
         'RG',
         'CERTIDÃO DE NASCIMENTO'
       ],
-      //myDoc: {}
 
       myDoc: {
         value: '',
         label: '',
         number: '',
-        pictures: [
-
+        gallery: [
+          require('src/assets/js.png')
         ]
-      },
-
-      // docTypes: [
-      //   {
-      //     label: 'CPF',
-      //     value: 'cpf'
-      //   },
-      //   {
-      //     label: 'Certidão de Nascimento',
-      //     value: 'birthReg'
-      //   }
-      // ]
-    }
-  },
-  methods: {
-    get(obj) {
-      return this.myDoc = obj;
+      }
     }
   }
 }
